@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morpion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Ajoutez vos styles CSS ici */
+        /* ... */
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Morpion</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <table class="table table-bordered text-center">
+                    <tbody>
+                        {% for row in board %}
+                            <tr>
+                                {% for cell in row %}
+                                    <td class="cell" data-row="{{ loop.index0 }}" data-col="{{ loop.index }}">{{ cell }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.0.7/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // JavaScript pour interagir avec le serveur Flask via AJAX
+        $(document).ready(function () {
+            $('.cell').on('click', function () {
+                var row = $(this).data('row');
+                var col = $(this).data('col');
+                var player = prompt("Entrez X ou O");
+
+                $.post('/make_move', {row: row, col: col, player: player}, function (data) {
+                    if (data.status === 'ok') {
+                        updateBoard(data.board);
+                    } else if (data.status === 'win') {
+                        alert('Le joueur ' + data.winner + ' a gagné!');
+                        resetBoard();
+                    } else if (data.status === 'draw') {
+                        alert('Match nul!');
+                        resetBoard();
+                    }
+                });
+            });
+
+            function updateBoard(newBoard) {
+                $('.cell').each(function (index) {
+                    var row = Math.floor(index / 3);
+                    var col = index % 3;
+                    $(this).text(newBoard[row][col]);
+                });
+            }
+
+            function resetBoard() {
+                $('.cell').text('');
+            }
+        });
+    </script>
+</body>
+</html>
