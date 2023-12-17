@@ -1,11 +1,30 @@
 import tkinter as tk
+import tkinter.messagebox as messagebox
 import json
 
 class Joueur:
     def __init__(self, pseudo):
         self.pseudo = pseudo
         self.nombre_victoires = 0
+        self.charger_score()
+    
+    def charger_score(self):
+        try:
+            with open('scores.json', 'r') as fichier_scores:
+                scores = json.load(fichier_scores)
+                pseudo = self.pseudo.lower()
+            if  pseudo in scores:
+                self.nombre_victoires = scores[pseudo]['victoires']
+            else :
+                scores[self.pseudo] = {'victoires': 0}
+                self.enregistrer_scores(scores)
+        except FileNotFoundError:
+            pass
+    def enregistrer_scores(self, scores):
+        with open('scores.json', 'w') as fichier_scores:
+            json.dump(scores, fichier_scores, indent=4)
 
+            
 class TableauDeJeu:
     def __init__(self, taille):
         self.taille = taille
@@ -36,7 +55,7 @@ class TableauDeJeu:
 
         # Vérification des diagonales
         if all(self.tableau[i][i] == symbole for i in range(self.taille)) or \
-           all(self.tableau[i][self.taille - 1 - i] == symbole for i in range(self.taille)):
+        all(self.tableau[i][self.taille - 1 - i] == symbole for i in range(self.taille)):
             return True
 
         return False
@@ -58,7 +77,7 @@ class MorpionGUI:
         for ligne in range(taille):
             for col in range(taille):
                 self.boutons[ligne][col] = tk.Button(root, text='', font=('normal', 20), width=4, height=2,
-                                                      command=lambda l=ligne, c=col: self.cliquer_case(l, c))
+                                                    command=lambda l=ligne, c=col: self.cliquer_case(l, c))
                 self.boutons[ligne][col].grid(row=ligne, column=col)
 
     def cliquer_case(self, ligne, colonne):
@@ -76,15 +95,19 @@ class MorpionGUI:
                 self.symbole_courant = 'O' if self.symbole_courant == 'X' else 'X'
 
     def afficher_message_victoire(self):
-        gagnant = self.joueur1.pseudo if self.symbole_courant == 'O' else self.joueur2.pseudo
-        tk.messagebox.showinfo("Partie terminée", f"Le joueur {gagnant} a gagné!")
+        gagnant = self.joueur1 if self.symbole_courant == 'X' else self.joueur2
+        pseudo = gagnant.pseudo
+        gagnant.nombre_victoires += 1
+        messagebox.showinfo("Partie terminée", "Le joueur {} a gagné!".format(pseudo))
+        self.fin_partie()
 
     def afficher_message_match_nul(self):
-        tk.messagebox.showinfo("Partie terminée", "Match nul!")
+        messagebox.showinfo("Partie terminée", "Match nul!")
+        self.fin_partie()
 
     def enregistrer_scores(self):
         scores = {'joueur1': {'pseudo': self.joueur1.pseudo, 'victoires': self.joueur1.nombre_victoires},
-                  'joueur2': {'pseudo': self.joueur2.pseudo, 'victoires': self.joueur2.nombre_victoires}}
+                'joueur2': {'pseudo': self.joueur2.pseudo, 'victoires': self.joueur2.nombre_victoires}}
 
         with open('scores.json', 'w') as fichier_scores:
             json.dump(scores, fichier_scores, indent=4)
@@ -97,10 +120,58 @@ class MorpionGUI:
             for col in range(self.taille):
                 self.boutons[ligne][col].config(text='')
 
-# Exemple d'utilisation
-joueur1 = Joueur("Joueur1")
-joueur2 = Joueur("Joueur2")
+    def fin_partie(self):
+        if self.demander_rejouer():
+            self.reinitialiser_partie()
+        else:
+            self.root.destroy()
 
-root = tk.Tk()
-morpion_gui = MorpionGUI(root, joueur1, joueur2, taille=3)
-root.mainloop()
+    def demander_rejouer(self):
+        choix = messagebox.askquestion("Rejouer", "Voulez-vous rejouer?")
+        return choix == 'yes'
+    
+
+class InterfaceConfiguration:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Configuration du jeu")
+
+        self.taille_grille = 3
+        self.pseudo_joueur1 = ""
+        self.pseudo_joueur2 = ""
+
+        self.label_taille = tk.Label(root, text="Taille de la grille :")
+        self.label_taille.pack()
+
+        self.entry_taille = tk.Entry(root)
+        self.entry_taille.insert(0, "3")
+        self.entry_taille.pack()
+
+        self.label_joueur1 = tk.Label(root, text="Nom du Joueur 1 :")
+        self.label_joueur1.pack()
+
+        self.entry_joueur1 = tk.Entry(root)
+        self.entry_joueur1.pack()
+
+        self.label_joueur2 = tk.Label(root, text="Nom du Joueur 2 :")
+        self.label_joueur2.pack()
+
+        self.entry_joueur2 = tk.Entry(root)
+        self.entry_joueur2.pack()
+
+        self.bouton_lancer = tk.Button(root, text="Lancer le jeu", command=self.lancer_jeu)
+        self.bouton_lancer.pack()
+
+    def lancer_jeu(self):
+        taille = int(self.entry_taille.get())
+        joueur1 = Joueur(self.entry_joueur1.get())
+        joueur2 = Joueur(self.entry_joueur2.get())
+        self.root.destroy()  # Ferme la fenêtre de configuration pour lancer le jeu
+        root = tk.Tk()
+        morpion_gui = MorpionGUI(root, joueur1, joueur2, taille)
+
+# Interface de configuration
+root_config = tk.Tk()
+interface_config = InterfaceConfiguration(root_config)
+root_config.mainloop()
+
