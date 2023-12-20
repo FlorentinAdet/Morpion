@@ -7,7 +7,7 @@ class Joueur:
     def __init__(self, pseudo):
         self.pseudo = pseudo
         self.nombre_victoires = 0
-            
+
 class TableauDeJeu:
     def __init__(self, taille):
         self.taille = taille
@@ -38,35 +38,35 @@ class TableauDeJeu:
 
         # Vérification des diagonales
         if all(self.tableau[i][i] == symbole for i in range(self.taille)) or \
-        all(self.tableau[i][self.taille - 1 - i] == symbole for i in range(self.taille)):
+                all(self.tableau[i][self.taille - 1 - i] == symbole for i in range(self.taille)):
             return True
 
         return False
 
 class MorpionGUI:
-    def __init__(self, root, joueur1, joueur2, taille, tableau="", symbole_courant = 'X'):
+    def __init__(self, root, joueur1, joueur2, taille, tableau=None, symbole_courant='X'):
         self.root = root
         self.root.title("Morpion")
         self.root.protocol("WM_DELETE_WINDOW", self.confirmer_fermeture)
-        
+
         self.joueur1 = joueur1
         self.joueur2 = joueur2
 
         self.taille = taille
-
         self.symbole_courant = symbole_courant
-        
-        if isinstance(tableau, str):
+
+        if tableau is None:
             self.tableau = TableauDeJeu(taille)
         else:
             self.tableau = tableau
 
         self.boutons = [[None for _ in range(taille)] for _ in range(taille)]
-    
+
         for ligne in range(taille):
             for col in range(taille):
-                self.boutons[ligne][col] = tk.Button(root, text=self.tableau.tableau[ligne][col], font=('normal', 20), width=4, height=2,
-                                                    command=lambda l=ligne, c=col: self.cliquer_case(l, c))
+                self.boutons[ligne][col] = tk.Button(root, text=self.tableau.tableau[ligne][col],
+                                                     font=('normal', 20), width=4, height=2,
+                                                     command=lambda l=ligne, c=col: self.cliquer_case(l, c))
                 self.boutons[ligne][col].grid(row=ligne, column=col)
 
     def cliquer_case(self, ligne, colonne):
@@ -85,7 +85,7 @@ class MorpionGUI:
         gagnant = self.joueur1 if self.symbole_courant == 'X' else self.joueur2
         pseudo = gagnant.pseudo
         gagnant.nombre_victoires += 1
-        messagebox.showinfo("Partie terminée", "Le joueur {} a gagné!".format(pseudo))
+        messagebox.showinfo("Partie terminée", f"Le joueur {pseudo} a gagné!")
         self.fin_partie()
 
     def afficher_message_match_nul(self):
@@ -103,9 +103,8 @@ class MorpionGUI:
     def demander_rejouer(self):
         choix = messagebox.askquestion("Rejouer", "Voulez-vous rejouer?")
         return choix == 'yes'
-    
+
     def sauvegarder_partie(self):
-        print("yes")
         etat_partie = {
             'taille': self.taille,
             'tableau': self.tableau.tableau,
@@ -115,14 +114,13 @@ class MorpionGUI:
 
         with open('sauvegarde_partie.pkl', 'wb') as fichier_sauvegarde:
             pickle.dump(etat_partie, fichier_sauvegarde)
-    
+
     def mettre_a_jour_interface(self):
         for ligne in range(self.taille):
             for col in range(self.taille):
                 self.boutons[ligne][col].config(text=self.tableau.tableau[ligne][col])
 
     def fin_partie(self):
-
         if self.demander_rejouer():
             self.reinitialiser_partie()
         else:
@@ -134,10 +132,10 @@ class MorpionGUI:
         self.root.destroy()
 
 class InterfaceConfiguration:
-    def __init__(self, root, save=False):    
-        if(save == True) : 
+    def __init__(self, root, save=False):
+        if save:
             self.charger_partie()
-        else :  
+        else:
             self.root = root
             self.root.title("Configuration du jeu")
 
@@ -149,7 +147,7 @@ class InterfaceConfiguration:
             self.entry_taille = tk.Entry(root)
             self.entry_taille.insert(0, "3")
             self.entry_taille.pack()
-            
+
             self.bouton_lancer = tk.Button(root, text="Lancer le jeu", command=self.lancer_jeu)
             self.bouton_lancer.pack()
 
@@ -160,7 +158,7 @@ class InterfaceConfiguration:
         self.root.destroy()  # Ferme la fenêtre de configuration pour lancer le jeu
         root = tk.Tk()
         MorpionGUI(root, joueur1, joueur2, taille)
-    
+
     def charger_partie(self):
         try:
             with open('sauvegarde_partie.pkl', 'rb') as fichier_sauvegarde:
@@ -174,7 +172,7 @@ class InterfaceConfiguration:
             root = tk.Tk()
             MorpionGUI(root, joueur1, joueur2, taille, tableau, symbole_courant)
             # Ajoutez d'autres informations d'état si nécessaires
-            #MorpionGUI.mettre_a_jour_interface()
+            # MorpionGUI.mettre_a_jour_interface()
         except FileNotFoundError:
             pass
 
@@ -183,12 +181,11 @@ root_config = tk.Tk()
 if os.path.exists('sauvegarde_partie.pkl'):
     charger_sauvegarde = messagebox.askyesno("Charger la sauvegarde", "Une sauvegarde existe. Voulez-vous la charger?")
     if charger_sauvegarde:
-        interface_config = InterfaceConfiguration(root_config, True) 
+        interface_config = InterfaceConfiguration(root_config, True)
     else:
         os.remove('sauvegarde_partie.pkl')
-        interface_config = InterfaceConfiguration(root_config) 
-else :
-    interface_config = InterfaceConfiguration(root_config) 
+        interface_config = InterfaceConfiguration(root_config)
+else:
+    interface_config = InterfaceConfiguration(root_config)
 
 root_config.mainloop()
-
