@@ -6,7 +6,7 @@ Note : mon code comporte volontairement peu de commentaire car pour moi il parle
 
 ### **1. `Joueur`**
 
-- **Description**: Représente un joueur du jeu Morpion. Pour le cas de cet exercice la classe joueur prend que un pseudo en paramètres. Mais cette classe a pour but surtout en cas de mise à jour futur du code si l’on souhaite par exemple implémenter un système de scoring. Cela sera plus facile pour les développeur en ayant déjà pensé à cette mise à jour potentielle.
+- **Description**: Représente un joueur du jeu Morpion. Pour le cas de cet exercice la classe joueur prend que un pseudo en paramètres. Mais cette classe a pour but surtout en cas de mise à jour future du code si l’on souhaite par exemple implémenter un système de scoring. Cela sera plus facile pour les développeurs en ayant déjà pensé à cette mise à jour potentielle.
 - **Attributs**:
     - **`pseudo`**: Le pseudo du joueur.
     - **`nombre_victoires`**: Le nombre de victoires du joueur.
@@ -17,7 +17,7 @@ Note : mon code comporte volontairement peu de commentaire car pour moi il parle
 
 - **Attributs**:
     - **`taille`**: La taille du tableau de jeu.
-    - **`tableau`**: Une matrice représentant l'état actuel du jeu. Elle est remplit des caractères vides
+    - **`tableau`**: Une matrice représentant l'état actuel du jeu. Elle est remplie des caractères vides
 - **Méthodes**:
     - **`jouer(ligne, colonne, symbole)`**: Joue un coup dans la case spécifiée par les indices **`ligne`** et **`colonne`** avec le symbole donné. Le coup est joué si seulement la case du tableau est vide.
 
@@ -40,7 +40,7 @@ Note : mon code comporte volontairement peu de commentaire car pour moi il parle
     - **`tableau`**: L'instance du tableau de jeu au cas où le joueur reprend une sauvegarde
     - **`boutons`**: Une matrice de boutons représentant le tableau de jeu dans l'interface.
 - **Méthodes**:
-    - **`cliquer_case(ligne, colonne)`**: Gère le clic sur une case, met à jour le tableau et vérifie s'il y a une victoire ou un match nul. Gère l’affichage graphique en fonction des différents événement
+    - **`cliquer_case(ligne, colonne)`**: Gère le clic sur une case, met à jour le tableau et vérifie s'il y a une victoire ou un match nul. Gère l’affichage graphique en fonction des différents événements
     
     - **`afficher_message_victoire()`**: Affiche un message de victoire avec le nom du joueur gagnant.
     - **`afficher_message_match_nul()`**: Affiche un message en cas de match nul.
