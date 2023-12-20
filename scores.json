@@ -1,22 +1,10 @@
 {
     "joueur1": {
-        "pseudo": "jean",
-        "victoires": 1
+        "pseudo": "joueur1",
+        "victoires": 0
     },
     "joueur2": {
-        "pseudo": "jeane",
-        "victoires": 0
-    },
-    "test": {
-        "victoires": 0
-    },
-    "teste": {
-        "victoires": 0
-    },
-    "jean": {
-        "victoires": 0
-    },
-    "jeane": {
+        "pseudo": "joueur2",
         "victoires": 0
     }
 }
